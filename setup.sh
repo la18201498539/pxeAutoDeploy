@@ -33,9 +33,11 @@ else
     git clone "$REPO_URL" "$INSTALL_DIR"
 fi
 
-# ── Python 依赖 ───────────────────────────────
+# ── Python 依赖 (venv，兼容 Ubuntu 24 externally-managed) ──
 echo "[3/4] 安装 Python 依赖 ..."
-pip3 install -r "$INSTALL_DIR/requirements.txt" --quiet
+apt-get install -y python3-venv -qq 2>/dev/null || true
+python3 -m venv "$INSTALL_DIR/.venv"
+"$INSTALL_DIR/.venv/bin/pip" install -q -r "$INSTALL_DIR/requirements.txt"
 
 # ── 权限 & 快捷方式 ──────────────────────────
 echo "[4/4] 设置权限 ..."
@@ -45,7 +47,7 @@ chmod +x "$INSTALL_DIR/main.py"
 cat > /usr/local/bin/pxe-deploy << 'EOF'
 #!/usr/bin/env bash
 # 保留 DISPLAY/XAUTHORITY 以支持图形界面
-sudo -E python3 /opt/pxeAutoDeploy/main.py "$@"
+sudo -E /opt/pxeAutoDeploy/.venv/bin/python /opt/pxeAutoDeploy/main.py "$@"
 EOF
 chmod +x /usr/local/bin/pxe-deploy
 
