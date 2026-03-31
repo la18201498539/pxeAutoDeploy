@@ -104,8 +104,15 @@ def collect_config() -> DeployConfig:
     timezone = ask("时区", "Asia/Shanghai")
 
     disks = get_disks()
-    print("  检测到以下磁盘:")
-    disk = choose("请选择安装磁盘编号", disks)
+    print(f"  {Y}注意: 以下是本机(部署服务器)的磁盘，目标机磁盘名可能不同{RST}")
+    print("  常见目标机磁盘名: /dev/sda (SATA/SAS)  /dev/nvme0n1 (NVMe)  /dev/vda (KVM)")
+    print("  参考列表(本机):")
+    for i, d in enumerate(disks, 1):
+        print(f"    {i}) {d}")
+    disk_raw = ask("目标机安装磁盘 (直接输入完整路径)", "/dev/sda")
+    disk = disk_raw.strip()
+    if not disk.startswith("/dev/"):
+        disk = "/dev/" + disk
     print(f"  {Y}⚠  警告: {disk} 上的所有数据将被清除！{RST}")
 
     action_raw = ask("安装完成后操作 (reboot/poweroff)", "reboot")
